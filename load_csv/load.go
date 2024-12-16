@@ -3,6 +3,7 @@ package load_csv
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 	"project/internal/models"
 	"project/internal/repositories"
@@ -48,7 +49,8 @@ func LoadClientsFromCSV(filePath string, repo *repositories.ClientRepository) er
 		// Insert client
 		err = repo.Insert(client)
 		if err != nil {
-			return fmt.Errorf("failed to insert client at line %d: %v", i+1, err)
+			log.Printf("Failed to insert client at line %d (CPF/CNPJ: %s): %v", i+1, client.CPF_CNPJ, err)
+			continue // Log error and proceed to next record
 		}
 	}
 
