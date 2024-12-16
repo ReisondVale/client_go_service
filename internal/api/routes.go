@@ -34,6 +34,23 @@ func RegisterRoutes(router *gin.Engine, db *sqlx.DB) {
 		c.JSON(http.StatusOK, gin.H{"exists": exists})
 	})
 
+	// Route to search for clients by name
+	router.GET("/clients/search", func(c *gin.Context) {
+		name := c.Query("name")
+		if name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Name query parameter is required"})
+			return
+		}
+
+		clients, err := repo.GetByName(name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, clients)
+	})
+
 	// Route to insert a new client
 	router.POST("/clients", func(c *gin.Context) {
 		var client models.Client
