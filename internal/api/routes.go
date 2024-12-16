@@ -3,6 +3,8 @@ package api
 import (
 	"project/internal/models"
 	"project/internal/repositories"
+	"sync/atomic"
+	"time"
 
 	"net/http"
 
@@ -10,7 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func RegisterRoutes(router *gin.Engine, db *sqlx.DB) {
+func RegisterRoutes(router *gin.Engine, db *sqlx.DB, requestCount *uint64, serverStart *time.Time) {
 	repo := &repositories.ClientRepository{DB: db}
 
 	// Route to fetch all records
@@ -66,5 +68,14 @@ func RegisterRoutes(router *gin.Engine, db *sqlx.DB) {
 		}
 
 		c.JSON(http.StatusCreated, gin.H{"message": "Client created successfully"})
+	})
+
+	// Route to verify application status
+	router.GET("/status", func(c *gin.Context) {
+		uptime := time.Since(*serverStart).Seconds()
+		c.JSON(http.StatusOK, gin.H{
+			"uptime_seconds": uptime,
+			"request_count":  atomic.LoadUint64(requestCount),
+		})
 	})
 }

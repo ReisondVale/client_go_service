@@ -4,8 +4,15 @@ import (
 	"log"
 	"project/internal/api"
 	"project/internal/db"
+	"sync/atomic"
+	"time"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	requestCount uint64
+	serverStart  time.Time
 )
 
 func main() {
@@ -16,9 +23,16 @@ func main() {
 	}
 	defer database.Close()
 
+	serverStart = time.Now()
 	// Define routes
 	router := gin.Default()
-	api.RegisterRoutes(router, database)
+
+	router.Use(func(c *gin.Context) {
+		atomic.AddUint64(&requestCount, 1) // Increment the request counter
+		c.Next()
+	})
+
+	api.RegisterRoutes(router, database, &requestCount, &serverStart)
 
 	// Start server
 	log.Println("Server started on port 8080")
