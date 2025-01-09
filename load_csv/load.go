@@ -7,8 +7,6 @@ import (
 	"os"
 	"project/internal/models"
 	"project/internal/repositories"
-
-	"github.com/klassmann/cpfcnpj"
 )
 
 func LoadClientsFromCSV(filePath string, repo *repositories.ClientRepository) error {
@@ -42,8 +40,8 @@ func LoadClientsFromCSV(filePath string, repo *repositories.ClientRepository) er
 
 		// Create a new client from CSV data
 		client := &models.Client{
-			Name:     cpfcnpj.Clean(line[1]),
-			CPF_CNPJ: cpfcnpj.Clean(line[0]),
+			Name:     line[1],
+			CPF_CNPJ: line[0],
 		}
 
 		// Insert client

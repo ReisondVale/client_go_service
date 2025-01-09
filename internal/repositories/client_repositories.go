@@ -21,6 +21,8 @@ func (r *ClientRepository) GetAll() ([]models.Client, error) {
 }
 
 func (r *ClientRepository) Insert(client *models.Client) error {
+	client.CPF_CNPJ = cpfcnpj.Clean(client.CPF_CNPJ)
+
 	// Check if CPF/CNPJ is valid and already exists in the database
 	exists, err := r.Exists(client.CPF_CNPJ)
 	if err != nil {

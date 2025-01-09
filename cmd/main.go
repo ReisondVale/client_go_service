@@ -4,6 +4,7 @@ import (
 	"log"
 	"project/internal/api"
 	"project/internal/db"
+	"project/internal/repositories"
 	"sync/atomic"
 	"time"
 
@@ -32,7 +33,9 @@ func main() {
 		c.Next()
 	})
 
-	api.RegisterRoutes(router, database, &requestCount, &serverStart)
+	clientRepo := &repositories.ClientRepository{DB: database}
+
+	api.RegisterRoutes(router, clientRepo, &requestCount, &serverStart)
 
 	// Start server
 	log.Println("Server started on port 8080")
