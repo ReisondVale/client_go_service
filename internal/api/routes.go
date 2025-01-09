@@ -2,18 +2,22 @@ package api
 
 import (
 	"project/internal/models"
-	"project/internal/repositories"
 	"sync/atomic"
 	"time"
 
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
 )
 
-func RegisterRoutes(router *gin.Engine, db *sqlx.DB, requestCount *uint64, serverStart *time.Time) {
-	repo := &repositories.ClientRepository{DB: db}
+type ClientRepository interface {
+	GetAll() ([]models.Client, error)
+	Insert(client *models.Client) error
+	Exists(cpfCnpj string) (bool, error)
+	GetByName(name string) ([]models.Client, error)
+}
+
+func RegisterRoutes(router *gin.Engine, repo ClientRepository, requestCount *uint64, serverStart *time.Time) {
 
 	// Route to fetch all records
 	router.GET("/clients", func(c *gin.Context) {
